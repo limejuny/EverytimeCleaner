@@ -18,12 +18,13 @@ puts "=============="
 
 # ARTICLE
 puts "REMOVE ARTICLE"
+start_num = 0
 loop do
   # page = agent.get('https://everytime.kr/myarticle')
   posted = agent.post("https://api.everytime.kr/find/board/article/list", {
     id: "myarticle",
     limit_num: 20,
-    start_num: 0,
+    start_num: start_num,
     moiminfo: true,
   })
 
@@ -32,14 +33,20 @@ loop do
   if c.length == 0
     break
   end
+  if (1...c.length).step(2).map{|i| c[i].attributes["posvote"].value.to_i}.count{|i| i<10} == 0
+    start_num += 20
+    next
+  end
   (1...c.length).step(2) do |i|
     # board_id = c[i].attributes['board_id'].value
     id = c[i].attributes["id"].value
     # uri = "https://everytime.kr/#{board_id}/v/#{id}"
 
-    del = agent.post("https://api.everytime.kr/remove/board/article", {
-      id: id,
-    })
+    if c[i].attributes["posvote"].value.to_i < 10
+      del = agent.post("https://api.everytime.kr/remove/board/article", {
+        id: id,
+      })
+    end
   end
 end
 
