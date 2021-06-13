@@ -5,16 +5,15 @@ agent = Mechanize.new
 page = agent.get("https://everytime.kr/login")
 form = page.forms.first
 
+$stdout.sync = true
+
 print "User ID >> "
 form.userid = gets.chomp
 print "Password >> "
 form.password = $stdin.noecho(&:gets).chomp
 form.submit # Mechanize::Page
 
-puts
-puts
-puts "=============="
-puts "=============="
+puts "\n\n==============\n=============="
 
 # ARTICLE
 puts "REMOVE ARTICLE"
@@ -46,11 +45,14 @@ loop do
       del = agent.post("https://api.everytime.kr/remove/board/article", {
         id: id,
       })
+      puts c[i].attributes["title"].value
+      puts "#{c[i].attributes["created_at"].value} / [#{c[i].attributes["title"].value}]"
     end
   end
 end
 
 # COMMENT
+puts "\n\n==============\n=============="
 puts "REMOVE COMMENT"
 loop do
   # page = agent.get('https://everytime.kr/mycommentarticle')
@@ -82,6 +84,7 @@ loop do
       del = agent.post("https://api.everytime.kr/remove/board/comment", {
         id: c2[j].attributes["id"].value,
       })
+      puts "#{c2[j].attributes["created_at"].value} / #{c2[j].attributes["text"].value} [#{c[i].attributes["title"].value}]"
     end
   end
 end
